@@ -1,0 +1,113 @@
+{
+  "version": "1.0",
+  "tools": [
+    {
+      "name": "registrar_venta",
+      "description": "Register a sale for a customer using natural language customer identification and item lines.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "cliente_texto": { "type": "string" },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "producto": { "type": "string" },
+                "cantidad": { "type": "number" }
+              },
+              "required": ["producto", "cantidad"],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": ["cliente_texto", "items"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "registrar_pago",
+      "description": "Register a payment for a customer.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "cliente_texto": { "type": "string" },
+          "monto": { "type": "number" }
+        },
+        "required": ["cliente_texto", "monto"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "consultar_saldo",
+      "description": "Query a customer's pending balance.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "cliente_texto": { "type": "string" }
+        },
+        "required": ["cliente_texto"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "generar_resumen_cobro",
+      "description": "Generate a collection summary for a customer.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "cliente_texto": { "type": "string" }
+        },
+        "required": ["cliente_texto"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "anular_transaccion",
+      "description": "Cancel a previously registered transaction.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "transaccion_id": { "type": "integer" },
+          "motivo": { "type": "string" }
+        },
+        "required": ["transaccion_id", "motivo"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "actualizar_precio",
+      "description": "Update the current price of a product.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "producto_texto": { "type": "string" },
+          "nuevo_precio": { "type": "number" }
+        },
+        "required": ["producto_texto", "nuevo_precio"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "consultar_analitica",
+      "description": "Run an analytics query over historical data.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "tipo": { "type": "string" },
+          "rango_fechas": {
+            "type": "object",
+            "properties": {
+              "desde": { "type": "string", "format": "date-time" },
+              "hasta": { "type": "string", "format": "date-time" }
+            },
+            "required": ["desde", "hasta"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["tipo", "rango_fechas"],
+        "additionalProperties": false
+      }
+    }
+  ]
+}

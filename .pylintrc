@@ -1,0 +1,22 @@
+[MASTER]
+ignore=.venv,venv,env,build,dist
+ignore-patterns=^alembic/versions/.*$
+
+[MESSAGES CONTROL]
+# Declarative ORM models and Alembic bootstrap contain repetitive
+# column/layout patterns that trigger noisy duplicate-code reports.
+disable=duplicate-code
+
+[FORMAT]
+max-line-length=88
+
+[BASIC]
+good-names=i,j,k,ex,rv,db
+
+[DESIGN]
+max-args=8
+max-attributes=10
+
+[REPORTS]
+score=yes
+fail-under=9.0
