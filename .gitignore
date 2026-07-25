@@ -1,0 +1,116 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+#  Usually these files are written to cwd so we leave them out of the gitignore
+#  Changes here would be overwritten by git clean
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE specific files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Log files
+logs/
+*.log
+
+# Runtime data
+instance/
+*.pid
+*.seed
+*.sqlite
+
+# Django stuff:
+*.pyo
+*.pyc
+*.pyi
+__pycache__/
+*.swp
+.DS_Store
+
+# Environment variables file (should be in .gitignore)
+.env
+
+# Virtual environment folder
+venv/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Python compiled files
+**/__pycache__/
+**/*.py[cod]
+
+# Local configuration and data (could contain secrets)
+*.local
+
+# Test coverage
+.htmlcov
+
+# Database files
+*.db
+*.sqlite3
+
+# Node.js dependencies
+node_modules/
+
+# macOS metadata files
+.DS_Store
+
+# End of file

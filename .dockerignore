@@ -1,0 +1,79 @@
+# .dockerignore for Python projects
+
+# Python environment files
+venv/
+.env
+.env.local
+.env*.local
+.env.production
+.env.test
+.env.development
+.env.*.local
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Python compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Local configuration and data
+*.local
+instance/
+
+# Log files
+logs/
+*.log
+
+# Test coverage reports
+htmlcov/
+.coverage
+.coverage.*
+.cache
+.pytest_cache/
+
+# Node.js dependencies
+node_modules/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+*.spec
+
+# Docker-specific files that shouldn't be in the image
+.dockerignore
+docker-compose.yml
+docker-compose.override.yml
+docker-compose.prod.yml
+docker-compose.dev.yml
+
+# Git-related files
+.git/
+.gitignore
+.gitmodules
+
+# Secrets and credentials
+secrets/
+credentials/
+*.pem
+*.key
+*.crt
+
+# Temporary files and cache
+tmp/
+temp/
+*.tmp
+*.cache
+
+# OS-generated files
+.DS_Store
+.DS_Store?
+._*
+
+# End of file
