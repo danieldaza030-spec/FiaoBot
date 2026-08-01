@@ -22,7 +22,15 @@ from .money import sum_money
 
 @dataclass(frozen=True, slots=True)
 class CollectionSummaryLine:
-    """Single sale line included in a collection summary."""
+    """Single sale line included in a collection summary.
+
+    Args:
+        product_id: Identifier of the product sold in the line.
+        product_name: Product name stored on the historical line.
+        quantity: Quantity sold for the line.
+        unit_price: Frozen unit price used at sale time.
+        subtotal: Line subtotal stored for auditing.
+    """
 
     product_id: int
     product_name: str
@@ -33,7 +41,15 @@ class CollectionSummaryLine:
 
 @dataclass(frozen=True, slots=True)
 class CollectionSummaryTransaction:
-    """Transaction entry included in a collection summary."""
+    """Transaction entry included in a collection summary.
+
+    Args:
+        transaction_id: Identifier of the transaction.
+        date: Timestamp when the transaction was registered.
+        total_amount: Historical total amount of the transaction.
+        status: Current status of the transaction.
+        items: Line items associated with the transaction.
+    """
 
     transaction_id: int
     date: datetime
@@ -44,7 +60,16 @@ class CollectionSummaryTransaction:
 
 @dataclass(frozen=True, slots=True)
 class CollectionSummary:
-    """Structured result for a customer's collection summary."""
+    """Structured result for a customer's collection summary.
+
+    Args:
+        customer: Customer being summarized.
+        transactions: Historical transactions included in the summary.
+        payments: Payments registered for the customer.
+        total_sales: Sum of active transaction totals.
+        total_payments: Sum of all recorded payments.
+        pending_balance: Calculated amount still pending.
+    """
 
     customer: Client
     transactions: list[CollectionSummaryTransaction] = field(default_factory=list)
@@ -55,7 +80,14 @@ class CollectionSummary:
 
 
 class CollectionSummaryService:
-    """Generate deterministic collection summaries for one customer."""
+    """Generate deterministic collection summaries for one customer.
+
+    Args:
+        client_repository: Repository used to validate the customer.
+        transaction_repository: Repository used to read customer sales.
+        payment_repository: Repository used to read customer payments.
+        balance_service: Service used to calculate the final balance.
+    """
 
     def __init__(
         self,
@@ -64,7 +96,20 @@ class CollectionSummaryService:
         payment_repository: PaymentRepository,
         balance_service: BalanceService,
     ) -> None:
-        """Initialize the service with its repository dependencies."""
+        """Initialize the service with its repository dependencies.
+
+        Args:
+            client_repository: Repository used to validate customers.
+            transaction_repository: Repository used to load sales history.
+            payment_repository: Repository used to load payment history.
+            balance_service: Service used to compute the pending balance.
+
+        Returns:
+            None.
+
+        Raises:
+            None.
+        """
 
         self.client_repository = client_repository
         self.transaction_repository = transaction_repository
@@ -72,7 +117,17 @@ class CollectionSummaryService:
         self.balance_service = balance_service
 
     def generate_collection_summary(self, customer_id: int) -> CollectionSummary:
-        """Return a structured summary of sales and payments for a customer."""
+        """Return a structured summary of sales and payments for a customer.
+
+        Args:
+            customer_id: Identifier of the customer to summarize.
+
+        Returns:
+            The customer summary with sales, payments and pending balance.
+
+        Raises:
+            CustomerNotFoundError: If the customer does not exist.
+        """
 
         customer = self.client_repository.get_by_id(customer_id)
         if customer is None:

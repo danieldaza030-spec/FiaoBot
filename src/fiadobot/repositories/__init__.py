@@ -1,6 +1,11 @@
 """Repository layer for fiadobot."""
 
 from .authorized_user_repository import AuthorizedUserRepository
+from .analytics_repository import (
+    AnalyticsRepository,
+    FrequentCustomerRow,
+    ProductSalesRow,
+)
 from .client_repository import ClientMatch, ClientRepository
 from .conversation_state_repository import ConversationStateRepository
 from .payment_repository import PaymentRepository
@@ -13,9 +18,12 @@ from .transaction_repository import (
 
 __all__ = [
     "AuthorizedUserRepository",
+    "AnalyticsRepository",
+    "FrequentCustomerRow",
     "ClientMatch",
     "ClientRepository",
     "ConversationStateRepository",
+    "ProductSalesRow",
     "PaymentRepository",
     "ProductRepository",
     "TransactionCreateInput",

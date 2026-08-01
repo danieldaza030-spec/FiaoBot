@@ -31,7 +31,12 @@ from .money import normalize_money
 
 @dataclass(frozen=True, slots=True)
 class SaleItemInput:
-    """Input data for a single product line in a sale."""
+    """Input data for a single product line in a sale.
+
+    Args:
+        product_id: Identifier of the product being sold.
+        quantity: Quantity requested by the customer.
+    """
 
     product_id: int
     quantity: Decimal
@@ -39,7 +44,15 @@ class SaleItemInput:
 
 @dataclass(frozen=True, slots=True)
 class SaleItemResult:
-    """Persisted sale line with pricing details."""
+    """Persisted sale line with frozen pricing details.
+
+    Args:
+        product_id: Identifier of the product that was sold.
+        product_name: Stored product name at the time of the sale.
+        quantity: Quantity sold for the line item.
+        unit_price: Frozen unit price used for the calculation.
+        subtotal: Line subtotal stored for historical traceability.
+    """
 
     product_id: int
     product_name: str
@@ -50,7 +63,14 @@ class SaleItemResult:
 
 @dataclass(frozen=True, slots=True)
 class SaleResult:
-    """Result of a sale registration operation."""
+    """Structured result returned after registering a sale.
+
+    Args:
+        transaction: Persisted transaction header.
+        items: Persisted line items included in the transaction.
+        total_amount: Total amount stored on the transaction.
+        pending_balance: Updated pending balance after the sale.
+    """
 
     transaction: Transaction
     items: list[SaleItemResult] = field(default_factory=list)
@@ -59,7 +79,14 @@ class SaleResult:
 
 
 class SaleService:
-    """Register customer sales and persist the resulting transaction."""
+    """Register customer sales and persist the resulting transaction.
+
+    Args:
+        client_repository: Repository used to validate the customer.
+        product_repository: Repository used to resolve product data.
+        transaction_repository: Repository used to persist the sale.
+        balance_service: Service used to recalculate the pending balance.
+    """
 
     def __init__(
         self,
@@ -68,7 +95,20 @@ class SaleService:
         transaction_repository: TransactionRepository,
         balance_service: BalanceService,
     ) -> None:
-        """Initialize the service with its repository dependencies."""
+        """Initialize the service with its repository dependencies.
+
+        Args:
+            client_repository: Repository used to validate customers.
+            product_repository: Repository used to resolve products.
+            transaction_repository: Repository used to persist transactions.
+            balance_service: Service used to recalculate balances.
+
+        Returns:
+            None.
+
+        Raises:
+            None.
+        """
 
         self.client_repository = client_repository
         self.product_repository = product_repository
@@ -82,7 +122,22 @@ class SaleService:
         *,
         date: datetime | None = None,
     ) -> SaleResult:
-        """Register a sale from normalized item inputs."""
+        """Register a sale from normalized item inputs.
+
+        Args:
+            customer_id: Identifier of the customer receiving the sale.
+            items: Normalized list of items to persist in the transaction.
+            date: Optional timestamp to assign to the transaction.
+
+        Returns:
+            The persisted transaction together with its line items and balance.
+
+        Raises:
+            CustomerNotFoundError: If the customer does not exist.
+            EmptySaleError: If the sale does not contain any items.
+            InvalidSaleItemError: If a quantity is zero or negative.
+            ProductNotFoundError: If one of the products does not exist.
+        """
 
         customer = self.client_repository.get_by_id(customer_id)
         if customer is None:

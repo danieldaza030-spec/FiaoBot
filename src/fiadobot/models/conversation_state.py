@@ -16,7 +16,17 @@ from fiadobot.db.base import Base
 
 
 class ConversationState(Base):
-    """Pending conversation state for a Telegram chat."""
+    """Pending conversation state for a Telegram chat.
+
+    The model stores transient data required to resume a disambiguation flow
+    or any other pending conversational branch.
+
+    Args:
+        chat_id: Telegram chat identifier that owns the state.
+        pending_action: Action waiting for a user response.
+        context: Serialized data required to resume the conversation.
+        created_at: Timestamp when the state was created.
+    """
 
     __tablename__ = "estado_conversacion"
 

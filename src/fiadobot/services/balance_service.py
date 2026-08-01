@@ -16,7 +16,13 @@ from .money import normalize_money, sum_money
 
 
 class BalanceService:
-    """Calculate customer balances from transactions and payments."""
+    """Calculate pending customer balances from the accounting data.
+
+    Args:
+        client_repository: Repository used to validate that the customer exists.
+        transaction_repository: Repository used to read active transactions.
+        payment_repository: Repository used to read registered payments.
+    """
 
     def __init__(
         self,
@@ -24,14 +30,37 @@ class BalanceService:
         transaction_repository: TransactionRepository,
         payment_repository: PaymentRepository,
     ) -> None:
-        """Initialize the service with its repository dependencies."""
+        """Initialize the service with its repository dependencies.
+
+        Args:
+            client_repository: Repository used to validate customers.
+            transaction_repository: Repository used to query sales.
+            payment_repository: Repository used to query payments.
+
+        Returns:
+            None.
+
+        Raises:
+            None.
+        """
 
         self.client_repository = client_repository
         self.transaction_repository = transaction_repository
         self.payment_repository = payment_repository
 
     def calculate_pending_balance(self, customer_id: int) -> Decimal:
-        """Return the pending balance for a customer."""
+        """Return the current pending balance for a customer.
+
+        Args:
+            customer_id: Identifier of the customer whose balance is required.
+
+        Returns:
+            The pending balance after subtracting all payments from the active
+            transaction totals.
+
+        Raises:
+            CustomerNotFoundError: If the customer does not exist.
+        """
 
         customer = self.client_repository.get_by_id(customer_id)
         if customer is None:

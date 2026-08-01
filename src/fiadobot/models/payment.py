@@ -19,7 +19,17 @@ if TYPE_CHECKING:
 
 
 class Payment(Base):
-    """Registered payment made by a customer."""
+    """Registered payment made by a customer.
+
+    The model stores the amount paid and the timestamp used in balance
+    calculations.
+
+    Args:
+        id: Internal identifier of the payment.
+        customer_id: Customer that made the payment.
+        amount: Amount recorded for the payment.
+        date: Timestamp when the payment was created.
+    """
 
     __tablename__ = "pagos"
 

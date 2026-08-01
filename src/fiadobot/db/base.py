@@ -18,6 +18,10 @@ NAMING_CONVENTION = {
 
 
 class Base(DeclarativeBase):
-    """Base class for all SQLAlchemy models in the application."""
+    """Base class for all SQLAlchemy models in the application.
+
+    This base centralizes naming conventions so Alembic and SQLAlchemy
+    generate consistent constraint and index names across the schema.
+    """
 
     metadata = MetaData(naming_convention=NAMING_CONVENTION)

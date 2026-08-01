@@ -19,7 +19,18 @@ if TYPE_CHECKING:
 
 
 class Client(Base):
-    """Customer registered in the system."""
+    """Customer registered in the system.
+
+    This model stores the customer identity used across sales, payments and
+    fuzzy name matching.
+
+    Args:
+        id: Internal identifier of the customer.
+        name: Unique customer name stored in the database.
+        alias: Optional nickname or short name.
+        phone_number: Optional contact phone number.
+        created_at: Timestamp when the customer was created.
+    """
 
     __tablename__ = "clientes"
 

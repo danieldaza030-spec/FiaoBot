@@ -18,7 +18,17 @@ if TYPE_CHECKING:
 
 
 class Product(Base):
-    """Product available for sale."""
+    """Product available for sale.
+
+    The model keeps the current catalog price separate from historical sales,
+    so future updates do not alter already recorded transactions.
+
+    Args:
+        id: Internal identifier of the product.
+        name: Unique product name stored in the database.
+        current_price: Current unit price used for new sales.
+        active: Whether the product is currently available for sale.
+    """
 
     __tablename__ = "productos"
 

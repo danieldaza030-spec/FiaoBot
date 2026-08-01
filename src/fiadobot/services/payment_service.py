@@ -20,14 +20,25 @@ from .money import normalize_money
 
 @dataclass(frozen=True, slots=True)
 class PaymentResult:
-    """Result of a payment registration operation."""
+    """Structured result returned after registering a payment.
+
+    Args:
+        payment: Persisted payment record.
+        pending_balance: Updated pending balance after applying the payment.
+    """
 
     payment: Payment
     pending_balance: Decimal = Decimal("0.00")
 
 
 class PaymentService:
-    """Register payments and return the updated pending balance."""
+    """Register customer payments and recompute the outstanding balance.
+
+    Args:
+        client_repository: Repository used to validate that the customer exists.
+        payment_repository: Repository used to persist payments.
+        balance_service: Service used to recalculate the pending balance.
+    """
 
     def __init__(
         self,
@@ -35,7 +46,19 @@ class PaymentService:
         payment_repository: PaymentRepository,
         balance_service: BalanceService,
     ) -> None:
-        """Initialize the service with its repository dependencies."""
+        """Initialize the service with its repository dependencies.
+
+        Args:
+            client_repository: Repository used to validate customers.
+            payment_repository: Repository used to store payments.
+            balance_service: Service used to recalculate balances.
+
+        Returns:
+            None.
+
+        Raises:
+            None.
+        """
 
         self.client_repository = client_repository
         self.payment_repository = payment_repository
@@ -48,7 +71,20 @@ class PaymentService:
         *,
         date: datetime | None = None,
     ) -> PaymentResult:
-        """Register a payment for a customer and return the updated balance."""
+        """Register a payment and return the updated balance.
+
+        Args:
+            customer_id: Identifier of the customer making the payment.
+            amount: Amount paid by the customer.
+            date: Optional timestamp to assign to the payment.
+
+        Returns:
+            The persisted payment together with the updated pending balance.
+
+        Raises:
+            CustomerNotFoundError: If the customer does not exist.
+            InvalidPaymentAmountError: If the amount is zero or negative.
+        """
 
         customer = self.client_repository.get_by_id(customer_id)
         if customer is None:

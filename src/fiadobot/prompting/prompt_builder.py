@@ -9,10 +9,24 @@ from .types import PromptBundle, PromptContext, ToolDefinition, ToolSchema
 
 
 class PromptBuilder:
-    """Load prompt assets and assemble the final provider-agnostic payload."""
+    """Load prompt assets and assemble the final provider-agnostic payload.
+
+    The builder keeps prompt content separate from provider integrations so the
+    system prompt and tool schema can evolve without touching vendor code.
+    """
 
     def __init__(self, prompts_dir: Path | str | None = None) -> None:
-        """Initialize the builder with the directory that stores prompt assets."""
+        """Initialize the builder with the directory that stores prompt assets.
+
+        Args:
+            prompts_dir: Optional override for the prompt asset directory.
+
+        Returns:
+            None.
+
+        Raises:
+            None.
+        """
 
         if prompts_dir is None:
             project_root = Path(__file__).resolve().parents[3]
@@ -21,13 +35,30 @@ class PromptBuilder:
         self.prompts_dir = Path(prompts_dir)
 
     def load_system_prompt(self) -> str:
-        """Load the system prompt text from disk."""
+        """Load the system prompt text from disk.
+
+        Returns:
+            The stripped system prompt loaded from the prompt assets.
+
+        Raises:
+            FileNotFoundError: If the system prompt file is missing.
+            OSError: If the file cannot be read.
+        """
 
         system_prompt_path = self.prompts_dir / "system_prompt.md"
         return system_prompt_path.read_text(encoding="utf-8").strip()
 
     def load_tool_schema(self) -> ToolSchema:
-        """Load the canonical tool schema from disk."""
+        """Load the canonical tool schema from disk.
+
+        Returns:
+            The canonical tool schema defined in the prompt assets.
+
+        Raises:
+            FileNotFoundError: If the tool schema file is missing.
+            json.JSONDecodeError: If the schema file is not valid JSON.
+            KeyError: If the expected schema keys are missing.
+        """
 
         schema_path = self.prompts_dir / "tools_schema.json"
         raw_schema = json.loads(schema_path.read_text(encoding="utf-8"))
@@ -42,7 +73,19 @@ class PromptBuilder:
         return ToolSchema(version=raw_schema["version"], tools=tools)
 
     def build(self, context: PromptContext) -> PromptBundle:
-        """Build a prompt bundle for the provided runtime context."""
+        """Build a prompt bundle for the provided runtime context.
+
+        Args:
+            context: Runtime information required to render the prompt.
+
+        Returns:
+            A fully assembled prompt bundle ready for a provider call.
+
+        Raises:
+            FileNotFoundError: If a prompt asset is missing.
+            json.JSONDecodeError: If the schema file is not valid JSON.
+            KeyError: If the schema file is missing required keys.
+        """
 
         system_prompt = self.load_system_prompt()
         tools = self.load_tool_schema()
@@ -60,7 +103,15 @@ class PromptBuilder:
         )
 
     def _render_system_prompt(self, system_prompt: str, context: PromptContext) -> str:
-        """Append the runtime context to the system prompt as a JSON block."""
+        """Append the runtime context to the system prompt as a JSON block.
+
+        Args:
+            system_prompt: Base system prompt loaded from disk.
+            context: Runtime context used to enrich the prompt.
+
+        Returns:
+            The final system prompt including a JSON runtime context block.
+        """
 
         runtime_context = {
             "channel": context.channel,

@@ -14,7 +14,15 @@ from fiadobot.db.base import Base
 
 
 class AuthorizedUser(Base):
-    """Telegram chat authorized to interact with the bot."""
+    """Telegram chat authorized to interact with the bot.
+
+    The table acts as a small access-control list for the Telegram backend.
+
+    Args:
+        chat_id: Telegram chat identifier allowed to use the bot.
+        role: Access role assigned to the chat.
+        added_at: Timestamp when the authorization was created.
+    """
 
     __tablename__ = "usuarios_autorizados"
 

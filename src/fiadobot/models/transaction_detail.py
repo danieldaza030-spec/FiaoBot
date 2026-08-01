@@ -19,7 +19,19 @@ if TYPE_CHECKING:
 
 
 class TransactionDetail(Base):
-    """A single line item inside a sale transaction."""
+    """A single line item inside a sale transaction.
+
+    Each row stores the frozen unit price and subtotal used when the sale was
+    created so historical balances remain stable over time.
+
+    Args:
+        id: Internal identifier of the line item.
+        transaction_id: Transaction that owns the line item.
+        product_id: Product referenced by the line item.
+        quantity: Quantity sold for the line item.
+        frozen_unit_price: Unit price stored when the sale was created.
+        subtotal: Frozen subtotal for the line item.
+    """
 
     __tablename__ = "transaccion_detalle"
 

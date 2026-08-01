@@ -17,7 +17,14 @@ from .base_repository import BaseRepository
 
 @dataclass(frozen=True, slots=True)
 class TransactionDetailInput:
-    """Input data required to persist a transaction detail."""
+    """Input data required to persist a transaction detail.
+
+    Args:
+        product_id: Identifier of the product included in the line.
+        quantity: Quantity sold for the product.
+        frozen_unit_price: Unit price stored at sale time.
+        subtotal: Precomputed subtotal for the line.
+    """
 
     product_id: int
     quantity: Decimal
@@ -27,7 +34,14 @@ class TransactionDetailInput:
 
 @dataclass(frozen=True, slots=True)
 class TransactionCreateInput:
-    """Input data required to persist a transaction aggregate."""
+    """Input data required to persist a transaction aggregate.
+
+    Args:
+        customer_id: Identifier of the customer receiving the sale.
+        total_amount: Precomputed total amount for the transaction.
+        details: Line items to persist under the transaction.
+        date: Optional timestamp to assign to the transaction.
+    """
 
     customer_id: int
     total_amount: Decimal
@@ -36,10 +50,23 @@ class TransactionCreateInput:
 
 
 class TransactionRepository(BaseRepository):
-    """Repository for transaction data access operations."""
+    """Repository for transaction data access operations.
+
+    The repository owns transaction persistence, listing and cancellation.
+    """
 
     def create_transaction(self, data: TransactionCreateInput) -> Transaction:
-        """Persist a transaction and its details as a single database unit."""
+        """Persist a transaction and its details as a single database unit.
+
+        Args:
+            data: Transaction header and line items to persist.
+
+        Returns:
+            The persisted transaction header.
+
+        Raises:
+            SQLAlchemyError: If the insert or commit fails.
+        """
 
         transaction = Transaction(
             customer_id=data.customer_id,
@@ -66,7 +93,14 @@ class TransactionRepository(BaseRepository):
         return transaction
 
     def get_by_id(self, transaction_id: int) -> Transaction | None:
-        """Return a transaction by primary key, if it exists."""
+        """Return a transaction by primary key, if it exists.
+
+        Args:
+            transaction_id: Primary key of the transaction to load.
+
+        Returns:
+            The matching transaction or ``None`` when no record exists.
+        """
 
         return self.session.get(Transaction, transaction_id)
 
@@ -76,7 +110,18 @@ class TransactionRepository(BaseRepository):
         *,
         include_cancelled: bool = False,
     ) -> list[Transaction]:
-        """Return transactions for a customer ordered from newest to oldest."""
+        """Return transactions for a customer ordered from newest to oldest.
+
+        Args:
+            customer_id: Primary key of the customer whose transactions are needed.
+            include_cancelled: Whether cancelled transactions should be included.
+
+        Returns:
+            Customer transactions ordered from newest to oldest.
+
+        Raises:
+            SQLAlchemyError: If the query fails.
+        """
 
         statement = select(Transaction).where(Transaction.customer_id == customer_id)
         if not include_cancelled:
@@ -94,7 +139,19 @@ class TransactionRepository(BaseRepository):
         *,
         include_cancelled: bool = False,
     ) -> list[Transaction]:
-        """Return transactions within a date range ordered from newest to oldest."""
+        """Return transactions within a date range ordered from newest to oldest.
+
+        Args:
+            start_date: Inclusive lower bound for the query.
+            end_date: Inclusive upper bound for the query.
+            include_cancelled: Whether cancelled transactions should be included.
+
+        Returns:
+            Transactions that fall within the requested date range.
+
+        Raises:
+            SQLAlchemyError: If the query fails.
+        """
 
         statement = select(Transaction).where(
             Transaction.date >= start_date,
@@ -115,7 +172,19 @@ class TransactionRepository(BaseRepository):
         *,
         cancelled_at: datetime | None = None,
     ) -> Transaction | None:
-        """Mark a transaction as cancelled without deleting it."""
+        """Mark a transaction as cancelled without deleting it.
+
+        Args:
+            transaction_id: Primary key of the transaction to cancel.
+            reason: Human-readable cancellation reason.
+            cancelled_at: Optional timestamp to assign to the cancellation.
+
+        Returns:
+            The cancelled transaction or ``None`` when it does not exist.
+
+        Raises:
+            SQLAlchemyError: If the update or commit fails.
+        """
 
         transaction = self.get_by_id(transaction_id)
         if transaction is None:

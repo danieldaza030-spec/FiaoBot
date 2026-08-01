@@ -22,21 +22,42 @@ from .exceptions import (
 
 @dataclass(frozen=True, slots=True)
 class CancellationResult:
-    """Result of a transaction cancellation operation."""
+    """Structured result returned after cancelling a transaction.
+
+    Args:
+        transaction: Persisted transaction marked as cancelled.
+        pending_balance: Updated pending balance after the cancellation.
+    """
 
     transaction: Transaction
     pending_balance: Decimal
 
 
 class TransactionCancellationService:
-    """Cancel transactions and return the updated customer balance."""
+    """Cancel transactions and return the updated customer balance.
+
+    Args:
+        transaction_repository: Repository used to load and update transactions.
+        balance_service: Service used to recalculate the pending balance.
+    """
 
     def __init__(
         self,
         transaction_repository: TransactionRepository,
         balance_service: BalanceService,
     ) -> None:
-        """Initialize the service with its repository dependencies."""
+        """Initialize the service with its repository dependencies.
+
+        Args:
+            transaction_repository: Repository used to manage transactions.
+            balance_service: Service used to recalculate balances.
+
+        Returns:
+            None.
+
+        Raises:
+            None.
+        """
 
         self.transaction_repository = transaction_repository
         self.balance_service = balance_service
@@ -48,7 +69,21 @@ class TransactionCancellationService:
         *,
         cancelled_at: datetime | None = None,
     ) -> CancellationResult:
-        """Cancel a transaction and return the updated pending balance."""
+        """Cancel a transaction and return the updated pending balance.
+
+        Args:
+            transaction_id: Identifier of the transaction to cancel.
+            reason: Human-readable explanation for the cancellation.
+            cancelled_at: Optional timestamp to assign to the cancellation.
+
+        Returns:
+            The cancelled transaction and the recalculated pending balance.
+
+        Raises:
+            InvalidCancellationReasonError: If the reason is blank.
+            TransactionNotFoundError: If the transaction does not exist.
+            TransactionAlreadyCancelledError: If the transaction is already cancelled.
+        """
 
         if not reason.strip():
             raise InvalidCancellationReasonError(

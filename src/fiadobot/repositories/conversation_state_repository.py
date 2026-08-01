@@ -12,10 +12,20 @@ from .base_repository import BaseRepository
 
 
 class ConversationStateRepository(BaseRepository):
-    """Repository for pending conversation states."""
+    """Repository for pending conversation states.
+
+    The repository stores the transient state used for disambiguation flows.
+    """
 
     def get_by_chat_id(self, chat_id: int) -> ConversationState | None:
-        """Return the pending state for a chat, if any."""
+        """Return the pending state for a chat, if any.
+
+        Args:
+            chat_id: Telegram chat identifier to search.
+
+        Returns:
+            The pending state or ``None`` when the chat has no active flow.
+        """
 
         return self.session.get(ConversationState, chat_id)
 
@@ -25,7 +35,19 @@ class ConversationStateRepository(BaseRepository):
         pending_action: str,
         context: dict[str, Any],
     ) -> ConversationState:
-        """Create or replace the pending state for a chat."""
+        """Create or replace the pending state for a chat.
+
+        Args:
+            chat_id: Telegram chat identifier that owns the pending flow.
+            pending_action: Name of the action waiting for confirmation.
+            context: Serialized context needed to resume the flow.
+
+        Returns:
+            The persisted conversation state.
+
+        Raises:
+            SQLAlchemyError: If the insert or commit fails.
+        """
 
         state = ConversationState(
             chat_id=chat_id,
@@ -38,7 +60,17 @@ class ConversationStateRepository(BaseRepository):
         return merged_state
 
     def delete_state(self, chat_id: int) -> bool:
-        """Delete the pending state for a chat if it exists."""
+        """Delete the pending state for a chat if it exists.
+
+        Args:
+            chat_id: Telegram chat identifier to clear.
+
+        Returns:
+            ``True`` when a state was deleted, otherwise ``False``.
+
+        Raises:
+            SQLAlchemyError: If the delete or commit fails.
+        """
 
         state = self.get_by_chat_id(chat_id)
         if state is None:
@@ -49,7 +81,11 @@ class ConversationStateRepository(BaseRepository):
         return True
 
     def list_pending(self) -> list[ConversationState]:
-        """Return all pending conversation states."""
+        """Return all pending conversation states.
+
+        Returns:
+            Pending conversation states ordered by creation time.
+        """
 
         statement = select(ConversationState).order_by(
             ConversationState.created_at.asc()

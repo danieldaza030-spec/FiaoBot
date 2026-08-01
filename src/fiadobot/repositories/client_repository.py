@@ -13,14 +13,23 @@ from .base_repository import BaseRepository
 
 @dataclass(frozen=True, slots=True)
 class ClientMatch:
-    """Approximate client match returned by fuzzy search."""
+    """Approximate client match returned by fuzzy search.
+
+    Args:
+        client: Matched client record.
+        similarity: Similarity score returned by PostgreSQL.
+    """
 
     client: Client
     similarity: float
 
 
 class ClientRepository(BaseRepository):
-    """Repository for customer data access operations."""
+    """Repository for customer data access operations.
+
+    The repository centralizes exact lookup, listing and fuzzy search logic for
+    customer records.
+    """
 
     def create_client(
         self,
@@ -28,7 +37,19 @@ class ClientRepository(BaseRepository):
         alias: str | None = None,
         phone_number: str | None = None,
     ) -> Client:
-        """Create a new customer and persist it to the database."""
+        """Create a new customer and persist it to the database.
+
+        Args:
+            name: Unique customer name to store.
+            alias: Optional short name or nickname.
+            phone_number: Optional phone number for the customer.
+
+        Returns:
+            The persisted customer record.
+
+        Raises:
+            SQLAlchemyError: If the insert or commit fails.
+        """
 
         client = Client(name=name, alias=alias, phone_number=phone_number)
         self.session.add(client)
@@ -37,18 +58,36 @@ class ClientRepository(BaseRepository):
         return client
 
     def get_by_id(self, client_id: int) -> Client | None:
-        """Return a customer by primary key, if it exists."""
+        """Return a customer by primary key, if it exists.
+
+        Args:
+            client_id: Primary key of the customer to load.
+
+        Returns:
+            The matching customer or ``None`` when no record exists.
+        """
 
         return self.session.get(Client, client_id)
 
     def get_by_name(self, name: str) -> Client | None:
-        """Return a customer matching the exact stored name."""
+        """Return a customer matching the exact stored name.
+
+        Args:
+            name: Exact customer name to search for.
+
+        Returns:
+            The matching customer or ``None`` when no record exists.
+        """
 
         statement = select(Client).where(Client.name == name)
         return self.session.scalar(statement)
 
     def list_all(self) -> list[Client]:
-        """Return all customers ordered by name."""
+        """Return all customers ordered by name.
+
+        Returns:
+            All stored customers sorted alphabetically.
+        """
 
         statement = select(Client).order_by(Client.name.asc())
         return list(self.session.scalars(statement).all())
@@ -60,7 +99,19 @@ class ClientRepository(BaseRepository):
         limit: int = 5,
         threshold: float = 0.3,
     ) -> list[ClientMatch]:
-        """Return the closest customer matches using pg_trgm similarity."""
+        """Return the closest customer matches using pg_trgm similarity.
+
+        Args:
+            text: Free-form text entered by the vendor.
+            limit: Maximum number of matches to return.
+            threshold: Minimum similarity score required for a match.
+
+        Returns:
+            The list of matches ordered by similarity.
+
+        Raises:
+            SQLAlchemyError: If the similarity query fails.
+        """
 
         search_text = text.lower().strip()
         searchable_name = func.lower(Client.name)

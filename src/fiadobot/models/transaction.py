@@ -29,7 +29,20 @@ if TYPE_CHECKING:
 
 
 class Transaction(Base):
-    """Sale transaction registered for a customer."""
+    """Sale transaction registered for a customer.
+
+    The transaction stores the frozen total amount and cancellation metadata,
+    while its line items keep the historical unit prices used at sale time.
+
+    Args:
+        id: Internal identifier of the transaction.
+        customer_id: Customer associated with the sale.
+        date: Timestamp when the transaction was created.
+        total_amount: Frozen total amount stored for the transaction.
+        status: Current transaction status.
+        cancellation_reason: Reason stored when the transaction is cancelled.
+        cancelled_at: Timestamp when the transaction was cancelled.
+    """
 
     __tablename__ = "transacciones"
 
